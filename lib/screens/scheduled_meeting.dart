@@ -13,6 +13,7 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
   final TextEditingController _linkController = TextEditingController();
+  final TextEditingController _venueController = TextEditingController();
   final TextEditingController _customSmsController = TextEditingController();
   final TextEditingController _customReminderController = TextEditingController();
   bool _isOnlineMeeting = false;
@@ -42,6 +43,7 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
     _dateController.dispose();
     _timeController.dispose();
     _linkController.dispose();
+    _venueController.dispose();
     _customSmsController.dispose();
     _customReminderController.dispose();
     _proposedByController.dispose();
@@ -350,6 +352,24 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
                   hintText: 'Select time',
                   prefixIcon: Icon(Icons.access_time_rounded, size: 18),
                 ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: 300,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildLabel('VENUE *'),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _venueController,
+                decoration: const InputDecoration(
+                  hintText: 'e.g. Conference Room A',
+                  prefixIcon: Icon(Icons.location_on_outlined, size: 18),
+                ),
+                validator: (value) => (value == null || value.isEmpty) ? 'Please enter a venue' : null,
               ),
             ],
           ),
