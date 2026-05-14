@@ -1,6 +1,5 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import '../widgets/footer_widget.dart';
 
 class ScheduledMeetingScreen extends StatefulWidget {
   const ScheduledMeetingScreen({super.key});
@@ -16,10 +15,8 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
   final TextEditingController _linkController = TextEditingController();
   final TextEditingController _customSmsController = TextEditingController();
   final TextEditingController _customReminderController = TextEditingController();
-  final List<PlatformFile> _referenceFiles = [];
   bool _isOnlineMeeting = false;
   bool _useCustomSms = false;
-  String _selectedReminder = 'No Reminder';
   
   final Map<String, String> _selectedMomEmployees = {
     'Proposed by': '',
@@ -36,9 +33,7 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
     'Farhan Khan', 'Grace Kim', 'Hassan Ali', 'Ibrahim Noor', 'Jaya Reddy',
   ];
   
-  String _amPm = 'AM';
   DateTime? _selectedDate;
-  String _selectedBsDate = '';
   TimeOfDay? _selectedTime;
   String _calendarType = 'AD';
 
@@ -62,19 +57,21 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A237E),
         elevation: 0,
-        title: const Text('Schedule a Meeting'),
+        centerTitle: false,
+        foregroundColor: Colors.white,
+        title: const Text(
+          'Schedule a Meeting',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none)),
-          const CircleAvatar(
-            radius: 14,
-            backgroundColor: Color(0xFFFFB300),
-            child: Text('S', style: TextStyle(color: Colors.white, fontSize: 11)),
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.notifications_none, size: 22),
+            tooltip: 'Notifications',
           ),
           const SizedBox(width: 8),
-          const Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Center(child: Text('System Admin', style: TextStyle(fontSize: 12, color: Colors.white))),
-          ),
+          _buildUserAvatar(),
+          const SizedBox(width: 16),
         ],
       ),
       body: SingleChildScrollView(
@@ -88,7 +85,7 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withValues(alpha: 0.03),
+                  color: Colors.white,
                   border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
                 ),
                 child: Column(
@@ -96,48 +93,71 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
                   children: [
                     const Text(
                       'Schedule a Meeting',
-                      style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1A1A2E),
+                        letterSpacing: -0.5,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Fill in the details and invite attendees to your next collaboration session.',
-                      style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                      'Fill in the details below to set up a new meeting session.',
+                      style: TextStyle(fontSize: 15, color: Colors.grey.shade600),
                     ),
                   ],
                 ),
               ),
-
-              // Form section
-              Container(
-                constraints: const BoxConstraints(maxWidth: 900),
+              
+              Padding(
                 padding: const EdgeInsets.all(40),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Section: Meeting Details
-                    _buildSectionCard(
-                      title: 'Meeting Details',
-                      icon: Icons.info_outline,
-                      child: Form(
-                        key: _formKey,
+                    Form(
+                      key: _formKey,
+                      child: _buildSectionCard(
+                        title: 'Meeting Information',
+                        icon: Icons.info_outline,
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildLabel('MEETING TITLE *'),
-                            _buildTextField('e.g. Q2 Planning Meeting'),
+                            const Text(
+                              'MEETING TITLE',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1A237E), letterSpacing: 0.5),
+                            ),
+                            const SizedBox(height: 10),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                hintText: 'Enter meeting subject...',
+                                prefixIcon: const Icon(Icons.title_rounded, size: 20),
+                              ),
+                              validator: (value) => (value == null || value.isEmpty) ? 'Please enter a title' : null,
+                            ),
                             const SizedBox(height: 24),
-                            _buildLabel('ORGANIZED BY: *'),
-                            _buildTextField('e.g. Information Technology Directorate'),
-                            const SizedBox(height: 24),
-                            _buildLabel('AGENDA *'),
-                            _buildTextArea('What will be discussed in this meeting?'),
+                            
+                            const Text(
+                              'AGENDA / DESCRIPTION',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1A237E), letterSpacing: 0.5),
+                            ),
+                            const SizedBox(height: 10),
+                            TextFormField(
+                              maxLines: 4,
+                              decoration: const InputDecoration(
+                                hintText: 'Describe the purpose of the meeting...',
+                                alignLabelWithHint: true,
+                              ),
+                            ),
                             const SizedBox(height: 32),
-                            _buildDateTimeAndVenueRow(),
-                            const SizedBox(height: 24),
+                            
+                            _buildDateTimeSection(),
+                            const SizedBox(height: 32),
                             _buildOnlineMeetingToggle(),
                           ],
                         ),
                       ),
                     ),
-
+                    
                     const SizedBox(height: 32),
                     _buildNotificationSettings(),
                     
@@ -155,28 +175,45 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
                         OutlinedButton(
                           onPressed: () => Navigator.pop(context),
                           style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 22),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            side: BorderSide(color: Colors.grey.shade300),
                           ),
-                          child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600)),
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                          ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 20),
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState?.validate() ?? false) {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Meeting scheduled successfully')));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Meeting scheduled successfully'),
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: Color(0xFF1A237E),
+                                ),
+                              );
                             }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1A237E),
-                            padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 56, vertical: 22),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            elevation: 4,
+                            shadowColor: const Color(0xFF1A237E).withValues(alpha: 0.3),
                           ),
-                          child: const Text('Schedule Meeting', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                          child: const Text(
+                            'Schedule Meeting',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 0.5),
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 80),
+                    const AppFooter(),
                   ],
                 ),
               ),
@@ -187,144 +224,198 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
     );
   }
 
+  Widget _buildUserAvatar() {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white24, width: 1.5),
+          ),
+          child: const CircleAvatar(
+            radius: 14,
+            backgroundColor: Color(0xFFFFB300),
+            child: Text(
+              'S',
+              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        const Text(
+          'System Admin',
+          style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w500),
+        ),
+      ],
+    );
+  }
+
   Widget _buildSectionCard({required String title, required IconData icon, required Widget child}) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border(left: BorderSide(color: Colors.blue.shade800, width: 4)),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: Colors.grey.shade50)),
+            ),
+            child: Row(
               children: [
-                Icon(icon, color: Colors.blue.shade800, size: 22),
+                Icon(icon, size: 20, color: const Color(0xFF1A237E)),
                 const SizedBox(width: 12),
-                Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E))),
+                Text(
+                  title.toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1A2E),
+                    letterSpacing: 1,
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 32),
-            child,
-          ],
-        ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(32),
+            child: child,
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildLabel(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E))),
-      ),
-    );
-  }
-
-  Widget _buildTextField(String hint) {
-    return TextFormField(
-      decoration: InputDecoration(hintText: hint, filled: true, fillColor: Colors.grey.shade50, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300))),
-      validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
-    );
-  }
-
-  Widget _buildTextArea(String hint) {
-    return TextFormField(
-      minLines: 4, maxLines: 6,
-      decoration: InputDecoration(hintText: hint, filled: true, fillColor: Colors.grey.shade50, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300))),
-      validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
-    );
-  }
-
-  Widget _buildDateTimeAndVenueRow() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildDateTimeSection() {
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      alignment: WrapAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('DATE & TIME *', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E))),
-            Container(
-              decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
-              child: Row(
-                children: [
-                  _buildCalendarToggle('BS'),
-                  _buildCalendarToggle('AD'),
-                ],
+        SizedBox(
+          width: 260,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'DATE',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1A237E), letterSpacing: 0.5),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 16, runSpacing: 16,
-          children: [
-            SizedBox(
-              width: 250,
-              child: TextFormField(
+              const SizedBox(height: 10),
+              TextFormField(
                 controller: _dateController,
+                readOnly: true,
+                onTap: () => _selectDate(context),
                 decoration: InputDecoration(
-                  hintText: 'Select Date',
-                  prefixIcon: const Icon(Icons.calendar_today_outlined, size: 20),
-                  filled: true, fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                readOnly: true, onTap: _selectDate,
-              ),
-            ),
-            GestureDetector(
-              onTap: _selectTime,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.grey.shade300)),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.access_time, size: 20, color: Colors.blue),
-                    const SizedBox(width: 8),
-                    Text(_selectedTime != null ? _selectedTime!.format(context) : 'Select Time', style: const TextStyle(fontWeight: FontWeight.bold)),
-                  ],
+                  hintText: 'Select date',
+                  prefixIcon: const Icon(Icons.calendar_today_rounded, size: 18),
+                  suffixIcon: Container(
+                    margin: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(8)),
+                    child: _buildCalendarToggle(),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(
-              width: 300,
-              child: TextFormField(
-                decoration: InputDecoration(hintText: 'VENUE (e.g. Virtual)', filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: 240,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'TIME',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1A237E), letterSpacing: 0.5),
               ),
-            ),
-          ],
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _timeController,
+                readOnly: true,
+                onTap: () => _selectTime(context),
+                decoration: const InputDecoration(
+                  hintText: 'Select time',
+                  prefixIcon: Icon(Icons.access_time_rounded, size: 18),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildCalendarToggle(String type) {
-    final bool isActive = _calendarType == type;
-    return GestureDetector(
+  Widget _buildCalendarToggle() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _calendarPill('AD'),
+        _calendarPill('BS'),
+      ],
+    );
+  }
+
+  Widget _calendarPill(String type) {
+    bool isActive = _calendarType == type;
+    return InkWell(
       onTap: () => setState(() => _calendarType = type),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(color: isActive ? Colors.white : Colors.transparent, borderRadius: BorderRadius.circular(6), boxShadow: isActive ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4)] : null),
-        child: Text(type, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isActive ? Colors.blue.shade800 : Colors.grey.shade500)),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: isActive ? [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 4, offset: const Offset(0, 2))] : null,
+        ),
+        child: Text(
+          type,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: isActive ? const Color(0xFF1A237E) : Colors.grey.shade500,
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildOnlineMeetingToggle() {
-    return Row(
-      children: [
-        Checkbox(value: _isOnlineMeeting, onChanged: (v) => setState(() => _isOnlineMeeting = v ?? false)),
-        const SizedBox(width: 8),
-        const Text('ONLINE MEETING', style: TextStyle(fontWeight: FontWeight.bold)),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.blue.shade100),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.video_camera_back_outlined, color: Colors.blue.shade800, size: 20),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Text(
+              'ONLINE MEETING',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.5),
+            ),
+          ),
+          Switch.adaptive(
+            value: _isOnlineMeeting,
+            activeTrackColor: const Color(0xFF1A237E),
+            onChanged: (v) => setState(() => _isOnlineMeeting = v),
+          ),
+        ],
+      ),
     );
   }
 
@@ -351,14 +442,30 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
   }
 
   Widget _buildChoiceButton(String label, bool active, VoidCallback onTap) {
-    return OutlinedButton(
-      onPressed: onTap,
-      style: OutlinedButton.styleFrom(
-        backgroundColor: active ? Colors.blue.shade50 : Colors.white,
-        side: BorderSide(color: active ? Colors.blue : Colors.grey.shade300),
-        padding: const EdgeInsets.symmetric(vertical: 16),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        decoration: BoxDecoration(
+          color: active ? const Color(0xFF1A237E) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: active ? const Color(0xFF1A237E) : Colors.grey.shade200),
+          boxShadow: active ? [BoxShadow(color: const Color(0xFF1A237E).withValues(alpha: 0.2), blurRadius: 8, offset: const Offset(0, 4))] : null,
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: active ? Colors.white : Colors.grey.shade600,
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
       ),
-      child: Text(label, style: TextStyle(color: active ? Colors.blue.shade900 : Colors.grey.shade700, fontWeight: FontWeight.bold)),
     );
   }
 
@@ -382,7 +489,10 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blue.shade800)),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1A237E), letterSpacing: 0.5),
+        ),
         const SizedBox(height: 10),
         Autocomplete<String>(
           optionsBuilder: (val) => val.text.isEmpty ? const Iterable<String>.empty() : _employeeNames.where((n) => n.toLowerCase().contains(val.text.toLowerCase())),
@@ -393,8 +503,18 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
           fieldViewBuilder: (ctx, fieldController, focusNode, onSubmitted) {
             if (fieldController.text != controller.text) fieldController.text = controller.text;
             return TextField(
-              controller: fieldController, focusNode: focusNode,
-              decoration: InputDecoration(hintText: 'Search employee...', filled: true, fillColor: Colors.grey.shade50, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
+              controller: fieldController,
+              focusNode: focusNode,
+              decoration: InputDecoration(
+                hintText: 'Search employee...',
+                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                prefixIcon: const Icon(Icons.person_search_outlined, size: 20),
+                filled: true,
+                fillColor: const Color(0xFFFBFBFB),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
+              ),
             );
           },
         ),
@@ -405,28 +525,54 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
   Widget _buildInviteMembers() {
     return _buildSectionCard(
       title: 'Invite Members',
-      icon: Icons.person_add_outlined,
-      child: const Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 20),
-          child: Text('Add attendees by searching their name or email.', style: TextStyle(color: Colors.grey)),
-        ),
+      icon: Icons.group_add_outlined,
+      child: Column(
+        children: [
+          const Text(
+            'Add participants to this meeting',
+            style: TextStyle(fontSize: 13, color: Colors.grey),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton.icon(
+            onPressed: () {},
+            icon: const Icon(Icons.add),
+            label: const Text('Add Member'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue.shade50,
+              foregroundColor: const Color(0xFF1A237E),
+              elevation: 0,
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Future<void> _selectDate() async {
+  Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
     );
-    if (picked != null) setState(() { _selectedDate = picked; _dateController.text = '${picked.year}-${picked.month}-${picked.day}'; });
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        _dateController.text = "${picked.year}-${picked.month}-${picked.day}";
+      });
+    }
   }
 
-  Future<void> _selectTime() async {
-    final TimeOfDay? picked = await showTimePicker(context: context, initialTime: _selectedTime ?? TimeOfDay.now());
-    if (picked != null) setState(() { _selectedTime = picked; });
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime ?? TimeOfDay.now(),
+    );
+    if (picked != null && picked != _selectedTime) {
+      setState(() {
+        _selectedTime = picked;
+        _timeController.text = picked.format(context);
+      });
+    }
   }
 }

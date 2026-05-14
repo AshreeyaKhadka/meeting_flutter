@@ -1,30 +1,21 @@
 import 'package:flutter/material.dart';
 import '../widgets/footer_widget.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _employeeIdController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isPasswordVisible = false;
 
   @override
   void dispose() {
     _employeeIdController.dispose();
-    _passwordController.dispose();
     super.dispose();
-  }
-
-  void _login() {
-    if (_formKey.currentState?.validate() ?? false) {
-      Navigator.pushReplacementNamed(context, '/dashboard');
-    }
   }
 
   @override
@@ -43,13 +34,13 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Main Login Card Section
+              // Main Activation Card Section
               Container(
                 constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height - 100),
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 24),
                 child: Container(
-                  width: 450,
+                  width: 480,
                   padding: const EdgeInsets.all(48),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -78,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 24),
                         const Text(
-                          'Welcome Back',
+                          'Activate Account',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -88,15 +79,35 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Enter your credentials to access the portal',
+                          'Enter your Employee ID to begin',
                           style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+                        ),
+                        const SizedBox(height: 24),
+                        
+                        // Stepper Indicators
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1A237E),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            CircleAvatar(radius: 4, backgroundColor: Colors.grey.shade200),
+                            const SizedBox(width: 8),
+                            CircleAvatar(radius: 4, backgroundColor: Colors.grey.shade200),
+                          ],
                         ),
                         const SizedBox(height: 40),
 
                         // Employee ID Field
                         _buildInputField(
-                          label: 'Employee ID',
-                          hint: 'Enter Employee ID',
+                          label: 'EMPLOYEE ID',
+                          hint: 'Enter your ID (e.g. 12345)',
                           icon: Icons.badge_outlined,
                           controller: _employeeIdController,
                           validator: (value) {
@@ -109,31 +120,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
-
-                        // Password Field
-                        _buildInputField(
-                          label: 'Password',
-                          hint: '••••••••',
-                          icon: Icons.lock_outline,
-                          isPassword: true,
-                          controller: _passwordController,
-                        ),
-                        
-                        const SizedBox(height: 12),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {},
-                            child: const Text('Forgot Password?', style: TextStyle(fontWeight: FontWeight.w600)),
-                          ),
-                        ),
-                        
                         const SizedBox(height: 32),
+                        
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: _login,
+                            onPressed: () {
+                              if (_formKey.currentState?.validate() ?? false) {
+                                // Logic for finding account
+                              }
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF1A237E),
                               foregroundColor: Colors.white,
@@ -143,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               shadowColor: const Color(0xFF1A237E).withValues(alpha: 0.3),
                             ),
                             child: const Text(
-                              'Sign In',
+                              'Find My Account',
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                             ),
                           ),
@@ -152,10 +148,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('Don\'t have an account?', style: TextStyle(color: Colors.grey.shade600)),
+                            Text('Already have an account?', style: TextStyle(color: Colors.grey.shade600)),
                             TextButton(
-                              onPressed: () => Navigator.pushNamed(context, '/register'),
-                              child: const Text('Register Now', style: TextStyle(fontWeight: FontWeight.bold)),
+                              onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+                              child: const Text('Sign in', style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
@@ -165,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               
-              // Footer at the bottom of scroll
+              // Footer
               const AppFooter(),
             ],
           ),
@@ -179,7 +175,6 @@ class _LoginScreenState extends State<LoginScreen> {
     required String hint,
     required IconData icon,
     required TextEditingController controller,
-    bool isPassword = false,
     String? Function(String?)? validator,
   }) {
     return Column(
@@ -187,21 +182,14 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E), letterSpacing: 0.2),
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E), letterSpacing: 0.5),
         ),
         const SizedBox(height: 10),
         TextFormField(
           controller: controller,
-          obscureText: isPassword && !_isPasswordVisible,
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: Icon(icon, size: 20, color: const Color(0xFF1A237E).withValues(alpha: 0.7)),
-            suffixIcon: isPassword
-                ? IconButton(
-                    icon: Icon(_isPasswordVisible ? Icons.visibility_off : Icons.visibility, size: 20),
-                    onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
-                  )
-                : null,
             filled: true,
             fillColor: const Color(0xFFFBFBFB),
             border: OutlineInputBorder(
@@ -217,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
               borderSide: const BorderSide(color: Color(0xFF1A237E), width: 1.5),
             ),
           ),
-          validator: validator ?? ((value) => (value == null || value.isEmpty) ? 'Required' : null),
+          validator: validator,
         ),
       ],
     );

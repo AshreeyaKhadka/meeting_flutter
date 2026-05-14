@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'all_meeting.dart';
 import 'user_management.dart';
+import '../widgets/footer_widget.dart';
 
 class AdministrationScreen extends StatefulWidget {
   const AdministrationScreen({super.key});
@@ -15,152 +16,165 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(58),
-        child: _buildAppBar(context),
-      ),
+      appBar: _buildAppBar(context),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Section: Title
-            const Text(
-              'Administration Portal',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A2E),
+            // Top Welcome Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(40),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+              ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      spacing: 20,
+                      runSpacing: 16,
+                      alignment: WrapAlignment.spaceBetween,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Administration Portal',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1A1A2E),
+                                letterSpacing: -1,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Manage platform users, view analytics and oversee meetings',
+                              style: TextStyle(fontSize: 15, color: Colors.grey.shade600),
+                            ),
+                          ],
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () => Navigator.pushReplacementNamed(context, '/dashboard'),
+                          icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                          label: const Text('Back to Dashboard'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey.shade100,
+                            foregroundColor: const Color(0xFF1A237E),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 40),
+                    _buildTabNavigation(),
+                  ],
+                ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Content based on selected tab
+                  if (_selectedTab == 2)
+                    const AllMeetingScreen()
+                  else if (_selectedTab == 1)
+                    const UserManagementScreen()
+                  else ...[
+                    // Stats cards
+                    _buildStatsRow(),
+                    const SizedBox(height: 40),
+                    // Bottom section: Activity + Trends
+                    _buildBottomSection(),
+                  ],
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Manage platform users, view analytics and oversee meetings',
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 32),
-            
-            // Tab Selection - Standard Look
-            _buildTabNavigation(),
-            const SizedBox(height: 32),
-
-            // Content based on selected tab
-            if (_selectedTab == 2)
-              const AllMeetingScreen()
-            else if (_selectedTab == 1)
-              const UserManagementScreen()
-            else ...[
-              // Stats cards
-              _buildStatsRow(),
-              const SizedBox(height: 32),
-              // Bottom section: Activity + Trends
-              _buildBottomSection(),
-            ],
+            const AppFooter(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
-    return Container(
-      color: const Color(0xFF1A237E),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: Row(
+        children: [
+          Image.asset('assets/ntc_logo.png', height: 32, width: 32),
+          const SizedBox(width: 12),
+          const Flexible(
+            child: Text(
+              'Administration Portal',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.notifications_none, size: 24),
+        ),
+        const SizedBox(width: 8),
+        _buildTopUserAvatar(context),
+        const SizedBox(width: 16),
+      ],
+    );
+  }
+
+  Widget _buildTopUserAvatar(BuildContext context) {
+    return PopupMenuButton<String>(
+      onSelected: (value) {
+        if (value == 'signout') {
+          Navigator.pushReplacementNamed(context, '/login');
+        }
+      },
+      offset: const Offset(0, 45),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.amber.shade700,
+            radius: 16,
+            child: const Icon(Icons.person, color: Colors.white, size: 18),
+          ),
+          const SizedBox(width: 8),
+          const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset('assets/ntc_logo.png', height: 32, width: 32),
-              const SizedBox(width: 12),
-              const Text(
-                'NT Meeting Portal',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
+              Text(
+                'System Admin',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
               ),
-              const SizedBox(width: 24),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/dashboard');
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white70,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                ),
-                child: const Text(
-                  'Dashboard',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
+              Text(
+                'Administrator',
+                style: TextStyle(fontSize: 10, color: Colors.white70),
               ),
-              const SizedBox(width: 4),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade700,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  ),
-                  child: const Text(
-                    'Administration',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 40),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.notifications_none, color: Colors.white),
-              ),
-              const SizedBox(width: 8),
-              CircleAvatar(
-                backgroundColor: Colors.amber.shade700,
-                radius: 16,
-                child: const Icon(Icons.person, color: Colors.white, size: 18),
-              ),
-              const SizedBox(width: 10),
-              PopupMenuButton<String>(
-                onSelected: (value) {
-                  if (value == 'signout') {
-                    Navigator.pushReplacementNamed(context, '/login');
-                  }
-                },
-                child: const Row(
-                  children: [
-                    Text(
-                      'System Admin',
-                      style: TextStyle(color: Colors.white, fontSize: 13),
-                    ),
-                    SizedBox(width: 2),
-                    Icon(Icons.keyboard_arrow_down, color: Colors.white70, size: 18),
-                  ],
-                ),
-                itemBuilder: (_) => [
-                  const PopupMenuItem(
-                    value: 'signout',
-                    child: Row(
-                      children: [
-                        Icon(Icons.logout, size: 16, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text('Sign Out'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 12),
+            ],
+          ),
+          const Icon(Icons.arrow_drop_down, color: Colors.white70),
+        ],
+      ),
+      itemBuilder: (_) => [
+        const PopupMenuItem(
+          value: 'signout',
+          child: Row(
+            children: [
+              Icon(Icons.logout, size: 18, color: Colors.red),
+              SizedBox(width: 12),
+              Text('Sign Out'),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -183,19 +197,15 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
     final bool isActive = _selectedTab == index;
     return InkWell(
       onTap: () => setState(() => _selectedTab = index),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      borderRadius: BorderRadius.circular(14),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
         decoration: BoxDecoration(
-          color: isActive ? const Color(0xFF1A237E) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          color: isActive ? const Color(0xFF1A237E) : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: isActive ? [BoxShadow(color: const Color(0xFF1A237E).withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0, 4))] : null,
+          border: Border.all(color: isActive ? const Color(0xFF1A237E) : Colors.grey.shade200),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -205,12 +215,12 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
               size: 20,
               color: isActive ? Colors.white : Colors.grey.shade600,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             Text(
               label,
               style: TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.bold,
                 color: isActive ? Colors.white : Colors.grey.shade700,
               ),
             ),
@@ -222,39 +232,39 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
 
   Widget _buildStatsRow() {
     return const Wrap(
-      spacing: 14,
-      runSpacing: 14,
+      spacing: 16,
+      runSpacing: 16,
       children: [
         _StatCard(
-          icon: Icons.calendar_today,
+          icon: Icons.event_note_rounded,
           iconColor: Color(0xFF1A237E),
           iconBgColor: Color(0xFFE8EAF6),
           label: 'Total Meetings',
           value: '45',
         ),
         _StatCard(
-          icon: Icons.trending_up,
+          icon: Icons.auto_graph_rounded,
           iconColor: Color(0xFFF57C00),
           iconBgColor: Color(0xFFFFF3E0),
           label: 'Today',
           value: '1',
         ),
         _StatCard(
-          icon: Icons.error_outline,
+          icon: Icons.assignment_late_rounded,
           iconColor: Color(0xFFE53935),
           iconBgColor: Color(0xFFFFEBEE),
           label: 'Pending MOM',
           value: '4',
         ),
         _StatCard(
-          icon: Icons.people_outline,
+          icon: Icons.people_alt_rounded,
           iconColor: Color(0xFF8E24AA),
           iconBgColor: Color(0xFFF3E5F5),
           label: 'Registered',
           value: '3598',
         ),
         _StatCard(
-          icon: Icons.show_chart,
+          icon: Icons.analytics_rounded,
           iconColor: Color(0xFF455A64),
           iconBgColor: Color(0xFFECEFF1),
           label: 'System Records',
@@ -606,7 +616,7 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                   color: Colors.grey.shade700,
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -618,17 +628,17 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey.shade800,
+                color: const Color(0xFF1A1A2E),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 10),
         ClipRRect(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(6),
           child: LinearProgressIndicator(
             value: value / maxValue,
-            minHeight: 8,
+            minHeight: 10,
             backgroundColor: Colors.grey.shade100,
             valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF1A237E)),
           ),
@@ -657,16 +667,17 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 220, // fixed width for wrapping
-      padding: const EdgeInsets.all(20),
+      width: 240, // fixed width for wrapping
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade100),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -674,38 +685,39 @@ class _StatCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: iconBgColor,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(icon, color: iconColor, size: 24),
           ),
-          const SizedBox(width: 14),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.w500,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1A2E),
+                    height: 1.1,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A2E),
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

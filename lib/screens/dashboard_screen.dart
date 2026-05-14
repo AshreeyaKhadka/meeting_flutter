@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'scheduled_meeting.dart';
 import 'buttons_in.dart';
+import '../widgets/footer_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -23,9 +24,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF0F2F5),
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(58),
-        child: _buildAppBar(context),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Image.asset('assets/ntc_logo.png', height: 32, width: 32),
+            const SizedBox(width: 12),
+            const Flexible(
+              child: Text(
+                'NT Meeting Portal',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.notifications_none, size: 24),
+          ),
+          const SizedBox(width: 8),
+          _buildTopUserAvatar(context),
+          const SizedBox(width: 16),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -37,6 +58,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _buildStatsRow(),
             const SizedBox(height: 24),
             _buildMeetingsSection(context),
+            const SizedBox(height: 40),
+            const AppFooter(),
           ],
         ),
       ),
@@ -45,112 +68,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // ─── AppBar ──────────────────────────────────────────────────────────────────
 
-  Widget _buildAppBar(BuildContext context) {
-    return Container(
-      color: const Color(0xFF1A237E),
-      child: SafeArea(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+  Widget _buildTopUserAvatar(BuildContext context) {
+    return PopupMenuButton<String>(
+      onSelected: (value) {
+        if (value == 'signout') {
+          Navigator.pushReplacementNamed(context, '/login');
+        }
+      },
+      offset: const Offset(0, 45),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.amber.shade700,
+            radius: 16,
+            child: const Icon(Icons.person, color: Colors.white, size: 18),
+          ),
+          const SizedBox(width: 8),
+          const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Logo + Name
-              Image.asset('assets/ntc_logo.png', height: 32, width: 32),
-              const SizedBox(width: 10),
-              const Text(
-                'NT Meeting Portal',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
+              Text(
+                'System Admin',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
               ),
-              const SizedBox(width: 20),
-
-              // Dashboard (active pill)
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade600,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                child: const Text(
-                  'Dashboard',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+              Text(
+                'Administrator',
+                style: TextStyle(fontSize: 10, color: Colors.white70),
               ),
-              const SizedBox(width: 4),
-
-              // Administration (plain)
-              TextButton(
-                onPressed: () => Navigator.pushReplacementNamed(context, '/administration'),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white70,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                ),
-                child: const Text(
-                  'Administration',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                ),
-              ),
-
-              const SizedBox(width: 40),
-
-              // Bell icon
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.notifications_none, color: Colors.white, size: 22),
-              ),
-              const SizedBox(width: 4),
-
-              // Avatar
-              CircleAvatar(
-                backgroundColor: Colors.amber.shade700,
-                radius: 16,
-                child: const Icon(Icons.person, color: Colors.white, size: 18),
-              ),
-              const SizedBox(width: 8),
-
-              // System Admin ▼
-              PopupMenuButton<String>(
-                onSelected: (value) {
-                  if (value == 'signout') {
-                    Navigator.pushReplacementNamed(context, '/login');
-                  }
-                },
-                child: const Row(
-                  children: [
-                    Text(
-                      'System Admin',
-                      style: TextStyle(color: Colors.white, fontSize: 13),
-                    ),
-                    SizedBox(width: 2),
-                    Icon(Icons.keyboard_arrow_down, color: Colors.white70, size: 18),
-                  ],
-                ),
-                itemBuilder: (_) => [
-                  const PopupMenuItem(
-                    value: 'signout',
-                    child: Row(
-                      children: [
-                        Icon(Icons.logout, size: 16, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text('Sign Out'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 8),
+            ],
+          ),
+          const Icon(Icons.arrow_drop_down, color: Colors.white70),
+        ],
+      ),
+      itemBuilder: (_) => [
+        const PopupMenuItem(
+          value: 'signout',
+          child: Row(
+            children: [
+              Icon(Icons.logout, size: 18, color: Colors.red),
+              SizedBox(width: 12),
+              Text('Sign Out'),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -159,77 +121,106 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildWelcomeCard(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: [const Color(0xFF1A237E), Colors.blue.shade900],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: const Color(0xFF1A237E).withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
-      child: Wrap(
-        spacing: 20,
-        runSpacing: 16,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        alignment: WrapAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left: welcome text
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+          Wrap(
+            spacing: 24,
+            runSpacing: 20,
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              RichText(
-                text: const TextSpan(
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A1A2E),
-                  ),
-                  children: [
-                    TextSpan(text: 'Welcome back, '),
-                    TextSpan(
-                      text: 'System',
-                      style: TextStyle(color: Color(0xFF1565C0)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Welcome back, System Admin 👋',
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'You have 3 meetings scheduled for today. Ready to start?',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.white.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 6),
-              Text(
-                'Manage and track all your meetings',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
+              ElevatedButton.icon(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ScheduledMeetingScreen()),
+                ),
+                icon: const Icon(Icons.add_rounded, size: 20),
+                label: const Text('New Meeting'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF1A237E),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 0,
                 ),
               ),
             ],
           ),
-          // Right: Schedule Meeting button
-          ElevatedButton.icon(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ScheduledMeetingScreen()),
-            ),
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text(
-              'Schedule Meeting',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1A237E),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              elevation: 0,
-            ),
+          const SizedBox(height: 32),
+          Row(
+            children: [
+              _buildNavButton(context, 'Dashboard', Icons.dashboard_rounded, true),
+              const SizedBox(width: 12),
+              _buildNavButton(context, 'Administration', Icons.admin_panel_settings_rounded, false),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNavButton(BuildContext context, String label, IconData icon, bool active) {
+    return InkWell(
+      onTap: !active ? () => Navigator.pushReplacementNamed(context, '/administration') : null,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: active ? Colors.white.withValues(alpha: 0.2) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: active ? Colors.white.withValues(alpha: 0.3) : Colors.white24,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: Colors.white),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -389,56 +380,56 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 250, // Fixed width so Wrap handles it nicely
+      width: 280,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border(left: BorderSide(color: accentColor, width: 4)),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade100),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      padding: const EdgeInsets.all(24),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: iconBg,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(icon, color: iconColor, size: 24),
           ),
           const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                value,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A2E),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1A1A2E),
+                    height: 1.1,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                label,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.w500,
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
