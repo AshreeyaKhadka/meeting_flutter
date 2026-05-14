@@ -83,138 +83,133 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
               // Header section
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+                  border: Border(bottom: BorderSide(color: Colors.grey.shade100)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Schedule a Meeting',
-                      style: TextStyle(
-                        fontSize: 28,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A1A2E),
+                        color: const Color(0xFF1A1A2E),
                         letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Text(
                       'Fill in the details below to set up a new meeting session.',
-                      style: TextStyle(fontSize: 15, color: Colors.grey.shade600),
+                      style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
                     ),
                   ],
                 ),
               ),
               
               Padding(
-                padding: const EdgeInsets.all(40),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Form(
-                      key: _formKey,
-                      child: _buildSectionCard(
-                        title: 'Meeting Information',
-                        icon: Icons.info_outline,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'MEETING TITLE',
-                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1A237E), letterSpacing: 0.5),
-                            ),
-                            const SizedBox(height: 10),
-                            TextFormField(
-                              decoration: InputDecoration(
-                                hintText: 'Enter meeting subject...',
-                                prefixIcon: const Icon(Icons.title_rounded, size: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1000),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Form(
+                        key: _formKey,
+                        child: _buildSectionCard(
+                          title: 'Meeting Information',
+                          icon: Icons.info_outline,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildLabel('MEETING TITLE'),
+                              const SizedBox(height: 8),
+                              TextFormField(
+                                decoration: const InputDecoration(
+                                  hintText: 'Enter meeting subject...',
+                                  prefixIcon: Icon(Icons.title_rounded, size: 20),
+                                ),
+                                validator: (value) => (value == null || value.isEmpty) ? 'Please enter a title' : null,
                               ),
-                              validator: (value) => (value == null || value.isEmpty) ? 'Please enter a title' : null,
-                            ),
-                            const SizedBox(height: 24),
-                            
-                            const Text(
-                              'AGENDA / DESCRIPTION',
-                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1A237E), letterSpacing: 0.5),
-                            ),
-                            const SizedBox(height: 10),
-                            TextFormField(
-                              maxLines: 4,
-                              decoration: const InputDecoration(
-                                hintText: 'Describe the purpose of the meeting...',
-                                alignLabelWithHint: true,
+                              const SizedBox(height: 24),
+                              
+                              _buildLabel('AGENDA / DESCRIPTION'),
+                              const SizedBox(height: 8),
+                              TextFormField(
+                                maxLines: 3,
+                                decoration: const InputDecoration(
+                                  hintText: 'Describe the purpose of the meeting...',
+                                  alignLabelWithHint: true,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 32),
-                            
-                            _buildDateTimeSection(),
-                            const SizedBox(height: 32),
-                            _buildOnlineMeetingToggle(),
-                          ],
+                              const SizedBox(height: 32),
+                              
+                              _buildDateTimeSection(),
+                              const SizedBox(height: 32),
+                              _buildOnlineMeetingToggle(),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    
-                    const SizedBox(height: 32),
-                    _buildNotificationSettings(),
-                    
-                    const SizedBox(height: 32),
-                    _buildMomApprovalWorkflow(),
-                    
-                    const SizedBox(height: 32),
-                    _buildInviteMembers(),
+                      
+                      const SizedBox(height: 32),
+                      _buildNotificationSettings(),
+                      
+                      const SizedBox(height: 32),
+                      _buildMomApprovalWorkflow(),
+                      
+                      const SizedBox(height: 32),
+                      _buildInviteMembers(),
 
-                    const SizedBox(height: 48),
-                    // Action Buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        OutlinedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 22),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            side: BorderSide(color: Colors.grey.shade300),
+                      const SizedBox(height: 48),
+                      // Action Buttons
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              side: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600),
+                            ),
                           ),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                          const SizedBox(width: 16),
+                          ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState?.validate() ?? false) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Meeting scheduled successfully'),
+                                    behavior: SnackBarBehavior.floating,
+                                    backgroundColor: Color(0xFF1A237E),
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF1A237E),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              elevation: 0,
+                            ),
+                            child: const Text(
+                              'Schedule Meeting',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (_formKey.currentState?.validate() ?? false) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Meeting scheduled successfully'),
-                                  behavior: SnackBarBehavior.floating,
-                                  backgroundColor: Color(0xFF1A237E),
-                                ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1A237E),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 56, vertical: 22),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            elevation: 4,
-                            shadowColor: const Color(0xFF1A237E).withValues(alpha: 0.3),
-                          ),
-                          child: const Text(
-                            'Schedule Meeting',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 0.5),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 80),
-                    const AppFooter(),
-                  ],
+                        ],
+                      ),
+                      const SizedBox(height: 80),
+                      const AppFooter(),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -251,16 +246,29 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
     );
   }
 
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF475569),
+        letterSpacing: 0.8,
+      ),
+    );
+  }
+
   Widget _buildSectionCard({required String title, required IconData icon, required Widget child}) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade100),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 20,
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
@@ -269,28 +277,28 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: Colors.grey.shade50)),
             ),
             child: Row(
               children: [
-                Icon(icon, size: 20, color: const Color(0xFF1A237E)),
-                const SizedBox(width: 12),
+                Icon(icon, size: 18, color: const Color(0xFF1A237E)),
+                const SizedBox(width: 10),
                 Text(
                   title.toUpperCase(),
                   style: const TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1A1A2E),
-                    letterSpacing: 1,
+                    letterSpacing: 0.5,
                   ),
                 ),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(32),
+            padding: const EdgeInsets.all(24),
             child: child,
           ),
         ],
@@ -300,20 +308,17 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
 
   Widget _buildDateTimeSection() {
     return Wrap(
-      spacing: 16,
-      runSpacing: 16,
+      spacing: 24,
+      runSpacing: 24,
       alignment: WrapAlignment.start,
       children: [
         SizedBox(
-          width: 260,
+          width: 300,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'DATE',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1A237E), letterSpacing: 0.5),
-              ),
-              const SizedBox(height: 10),
+              _buildLabel('DATE'),
+              const SizedBox(height: 8),
               TextFormField(
                 controller: _dateController,
                 readOnly: true,
@@ -323,7 +328,6 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
                   prefixIcon: const Icon(Icons.calendar_today_rounded, size: 18),
                   suffixIcon: Container(
                     margin: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(8)),
                     child: _buildCalendarToggle(),
                   ),
                 ),
@@ -332,15 +336,12 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
           ),
         ),
         SizedBox(
-          width: 240,
+          width: 200,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'TIME',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1A237E), letterSpacing: 0.5),
-              ),
-              const SizedBox(height: 10),
+              _buildLabel('TIME'),
+              const SizedBox(height: 8),
               TextFormField(
                 controller: _timeController,
                 readOnly: true,
@@ -392,30 +393,56 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
   }
 
   Widget _buildOnlineMeetingToggle() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.blue.shade50.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade100),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.video_camera_back_outlined, color: Colors.blue.shade800, size: 20),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Text(
-              'ONLINE MEETING',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.5),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () => setState(() => _isOnlineMeeting = !_isOnlineMeeting),
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: Checkbox(
+                    value: _isOnlineMeeting,
+                    onChanged: (v) => setState(() => _isOnlineMeeting = v ?? false),
+                    activeColor: const Color(0xFFB8860B), // Golden/Mustard color as in image
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Icon(Icons.videocam_outlined, size: 20, color: Color(0xFF1A237E)),
+                const SizedBox(width: 8),
+                const Text(
+                  'ONLINE MEETING',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: Color(0xFF1A237E),
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
             ),
           ),
-          Switch.adaptive(
-            value: _isOnlineMeeting,
-            activeTrackColor: const Color(0xFF1A237E),
-            onChanged: (v) => setState(() => _isOnlineMeeting = v),
+        ),
+        if (_isOnlineMeeting) ...[
+          const SizedBox(height: 20),
+          _buildLabel('MEETING LINK *'),
+          const SizedBox(height: 8),
+          TextFormField(
+            controller: _linkController,
+            decoration: const InputDecoration(
+              hintText: 'e.g. https://zoom.us/j/123456789',
+              prefixIcon: Icon(Icons.link_rounded, size: 20),
+            ),
+            validator: (value) => (_isOnlineMeeting && (value == null || value.isEmpty)) ? 'Please enter meeting link' : null,
           ),
         ],
-      ),
+      ],
     );
   }
 
@@ -476,9 +503,9 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
       child: Column(
         children: [
           _buildMomSearchField(label: 'PROPOSED BY', controller: _proposedByController, role: 'Proposed by'),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           _buildMomSearchField(label: 'RECOMMENDED BY', controller: _recommendedByController, role: 'Recommended by'),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           _buildMomSearchField(label: 'APPROVED BY', controller: _approvedByController, role: 'Approved by'),
         ],
       ),
@@ -489,11 +516,8 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1A237E), letterSpacing: 0.5),
-        ),
-        const SizedBox(height: 10),
+        _buildLabel(label),
+        const SizedBox(height: 8),
         Autocomplete<String>(
           optionsBuilder: (val) => val.text.isEmpty ? const Iterable<String>.empty() : _employeeNames.where((n) => n.toLowerCase().contains(val.text.toLowerCase())),
           onSelected: (selection) => setState(() {
@@ -527,20 +551,57 @@ class _ScheduledMeetingScreenState extends State<ScheduledMeetingScreen> {
       title: 'Invite Members',
       icon: Icons.group_add_outlined,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Add participants to this meeting',
-            style: TextStyle(fontSize: 13, color: Colors.grey),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Manage Participants',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E)),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Add employees or external members to this meeting.',
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                    ),
+                  ],
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.add_circle_outline, size: 18),
+                label: const Text('Add Participant'),
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF1A237E),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.add),
-            label: const Text('Add Member'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue.shade50,
-              foregroundColor: const Color(0xFF1A237E),
-              elevation: 0,
+          const SizedBox(height: 24),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade100),
+            ),
+            child: Center(
+              child: Column(
+                children: [
+                  Icon(Icons.people_outline, size: 32, color: Colors.grey.shade300),
+                  const SizedBox(height: 12),
+                  Text(
+                    'No participants added yet',
+                    style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
