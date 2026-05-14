@@ -352,7 +352,7 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
               children: [
                 // Table header
                 Container(
-                  width: 800, // Fixed width for horizontal scrolling
+                  width: 1000, // Fixed width for horizontal scrolling
                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade50,
@@ -449,7 +449,7 @@ class _AdministrationScreenState extends State<AdministrationScreen> {
     required String date,
   }) {
     return Container(
-      width: 800, // Fixed width
+      width: 1000, // Fixed width
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
       child: Row(
         children: [

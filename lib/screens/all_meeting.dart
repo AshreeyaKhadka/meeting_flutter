@@ -304,7 +304,7 @@ class _AllMeetingScreenState extends State<AllMeetingScreen> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: 1000, // Fixed width for horizontal scrolling
+              width: 1200, // Fixed width for horizontal scrolling
               child: Column(
                 children: [
                   Container(
@@ -318,12 +318,12 @@ class _AllMeetingScreenState extends State<AllMeetingScreen> {
                     ),
                     child: Row(
                       children: [
-                        _tableHeader('TITLE / AGENDA', 3),
-                        _tableHeader('ORGANIZER', 3),
+                        _tableHeader('TITLE / AGENDA', 4),
+                        _tableHeader('ORGANIZER', 4),
                         _tableHeader('STATUS', 2),
                         _tableHeader('DATE & TIME', 2),
                         _tableHeader('MEMBERS', 1),
-                        _tableHeader('ACTIONS', 1),
+                        _tableHeader('ACTIONS', 2),
                       ],
                     ),
                   ),
@@ -527,12 +527,12 @@ class _AllMeetingScreenState extends State<AllMeetingScreen> {
         InkWell(
           onTap: () => _showMeetingDetail(m),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 32),
             child: Row(
               children: [
                 // Title / Agenda
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -546,14 +546,16 @@ class _AllMeetingScreenState extends State<AllMeetingScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        '—',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
+                        m.agenda,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                       ),
                     ],
                   ),
                 ),
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: Row(
                     children: [
                       Container(
@@ -659,28 +661,34 @@ class _AllMeetingScreenState extends State<AllMeetingScreen> {
                 ),
                 // Actions
                 Expanded(
-                  flex: 1,
-                  child: OutlinedButton(
-                    onPressed: () => _showMeetingDetail(m),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      side: const BorderSide(color: Color(0xFFE0E0E0)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.chevron_right, size: 16, color: Color(0xFF1976D2)),
-                        SizedBox(width: 4),
-                        Text(
-                          'Details',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1976D2),
-                          ),
+                  flex: 2,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: OutlinedButton(
+                      onPressed: () => _showMeetingDetail(m),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        side: const BorderSide(color: Color(0xFFE0E0E0)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.chevron_right, size: 16, color: Color(0xFF1976D2)),
+                            SizedBox(width: 4),
+                            Text(
+                              'Details',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1976D2),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),

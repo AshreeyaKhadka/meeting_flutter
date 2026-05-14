@@ -222,12 +222,16 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               ),
               Expanded(
                 flex: 30,
-                child: Row(
-                  children: [
-                    _buildBtn(Icons.person_off, 'Suspend', Colors.red),
-                    const SizedBox(width: 8),
-                    _buildBtn(Icons.admin_panel_settings, 'Make Admin', const Color(0xFF1976D2)),
-                  ],
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      _buildBtn(Icons.person_off, 'Suspend', Colors.red),
+                      const SizedBox(width: 8),
+                      _buildBtn(Icons.admin_panel_settings, 'Make Admin', const Color(0xFF1976D2)),
+                    ],
+                  ),
                 ),
               ),
             ],
