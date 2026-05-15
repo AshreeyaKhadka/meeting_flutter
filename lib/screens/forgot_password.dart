@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
 import '../widgets/footer_widget.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _employeeIdController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isPasswordVisible = false;
 
   @override
   void dispose() {
     _employeeIdController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
-  void _login() {
+  void _sendOtpRequest() {
     if (_formKey.currentState?.validate() ?? false) {
-      Navigator.pushReplacementNamed(context, '/dashboard');
+      // Handle OTP request logic
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('OTP Request Sent')),
+      );
     }
   }
 
@@ -43,7 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Main Login Card Section
               Container(
                 constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height - 100),
                 alignment: Alignment.center,
@@ -71,14 +70,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF0F2F5),
+                            color: const Color(0xFF1A237E), // Dark blue background for logo as per screenshot
                             borderRadius: BorderRadius.circular(24),
                           ),
                           child: Image.asset('assets/ntc_logo.png', height: 60, width: 60),
                         ),
                         const SizedBox(height: 24),
                         const Text(
-                          'Welcome Back',
+                          'Reset Password',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -88,62 +87,38 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Enter your credentials to access the portal',
+                          'Recover access to your account',
                           style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
                         ),
                         const SizedBox(height: 40),
 
                         // Employee ID Field
                         _buildInputField(
-                          label: 'Employee ID',
-                          hint: 'Enter Employee ID',
-                          icon: Icons.badge_outlined,
+                          label: 'EMPLOYEE ID',
+                          hint: 'Enter your Employee ID',
                           controller: _employeeIdController,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Required';
                             }
-                            if (!RegExp(r'^\d+$').hasMatch(value.trim())) {
-                              return 'Must contain only digits';
-                            }
                             return null;
                           },
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Password Field
-                        _buildInputField(
-                          label: 'Password',
-                          hint: '••••••••',
-                          icon: Icons.lock_outline,
-                          isPassword: true,
-                          controller: _passwordController,
-                        ),
-                        
-                        const SizedBox(height: 12),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () => Navigator.pushNamed(context, '/forgot-password'),
-                            child: const Text('Forgot Password?', style: TextStyle(fontWeight: FontWeight.w600)),
-                          ),
                         ),
                         
                         const SizedBox(height: 32),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: _login,
+                            onPressed: _sendOtpRequest,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF1A237E),
+                              backgroundColor: const Color(0xFF0D47A1), // Blue color from screenshot
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 20),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               elevation: 4,
-                              shadowColor: const Color(0xFF1A237E).withValues(alpha: 0.3),
                             ),
                             child: const Text(
-                              'Sign In',
+                              'Send OTP Request',
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                             ),
                           ),
@@ -152,10 +127,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('Don\'t have an account?', style: TextStyle(color: Colors.grey.shade600)),
+                            Text('Remember your password?', style: TextStyle(color: Colors.grey.shade600)),
                             TextButton(
-                              onPressed: () => Navigator.pushNamed(context, '/register'),
-                              child: const Text('Register Now', style: TextStyle(fontWeight: FontWeight.bold)),
+                              onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+                              child: const Text('Sign In', style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
@@ -164,8 +139,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              
-              // Footer at the bottom of scroll
               const AppFooter(),
             ],
           ),
@@ -177,9 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildInputField({
     required String label,
     required String hint,
-    required IconData icon,
     required TextEditingController controller,
-    bool isPassword = false,
     String? Function(String?)? validator,
   }) {
     return Column(
@@ -187,37 +158,31 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E), letterSpacing: 0.2),
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.5),
         ),
         const SizedBox(height: 10),
         TextFormField(
           controller: controller,
-          obscureText: isPassword && !_isPasswordVisible,
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: Icon(icon, size: 20, color: const Color(0xFF1A237E).withValues(alpha: 0.7)),
-            suffixIcon: isPassword
-                ? IconButton(
-                    icon: Icon(_isPasswordVisible ? Icons.visibility_off : Icons.visibility, size: 20),
-                    onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
-                  )
-                : null,
+            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
             filled: true,
-            fillColor: const Color(0xFFFBFBFB),
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: Colors.grey.shade200),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: Colors.grey.shade200),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color(0xFF1A237E), width: 1.5),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFF0D47A1), width: 1.5),
             ),
           ),
-          validator: validator ?? ((value) => (value == null || value.isEmpty) ? 'Required' : null),
+          validator: validator,
         ),
       ],
     );

@@ -3,6 +3,7 @@ import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/administration.dart';
 import 'screens/register.dart';
+import 'screens/forgot_password.dart';
 
 void main() {
   runApp(const MyApp());
@@ -72,6 +73,7 @@ class MyApp extends StatelessWidget {
         '/dashboard': (_) => const DashboardScreen(),
         '/administration': (_) => const AdministrationScreen(),
         '/register': (_) => const RegisterScreen(),
+        '/forgot-password': (_) => const ForgotPasswordScreen(),
       },
     );
   }
